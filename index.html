@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Meyer - Hub de Calculadoras para Jornalistas</title>
+  <meta name="description" content="Meyer: hub de calculadoras jornalísticas (variação percentual, taxa per capita, orçamento, estatística, regra de três, densidade, hectares e estimativa de público). Funciona offline.">
+  <meta name="theme-color" content="#0040FF">
+  <link rel="canonical" href="https://magpe-stack.github.io/Meyer/">
+
+  <!-- Favicon, ícones e PWA: SOMENTE as artes hospedadas na raiz do repositório -->
+  <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+  <link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
+  <link rel="apple-touch-icon" href="icon-192.png">
+  <link rel="manifest" href="manifest.json">
+
+  <!-- Aplica o tema salvo ANTES da pintura (evita "piscar"). Padrão: claro. -->
+  <script>
+    (function () {
+      try {
+        var t = localStorage.getItem('meyer-theme');
+        document.documentElement.setAttribute('data-theme', t === 'dark' ? 'dark' : 'light');
+      } catch (e) { /* localStorage indisponível: mantém o tema claro */ }
+    })();
+  </script>
+
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <a class="skip-link" href="#painel">Pular para o conteúdo</a>
+
+  <!-- ============ SPLASH SCREEN (3 segundos) ============ -->
+  <div id="splash" class="splash" role="status" aria-label="Carregando o Meyer">
+    <div class="splash__inner">
+      <img class="splash__logo" src="icon-192.png" width="144" height="144" alt="Logotipo do Meyer: mão estilizada segurando uma calculadora">
+      <h1 class="splash__title">Meyer</h1>
+      <p class="splash__subtitle">Hub de Calculadoras Jornalísticas</p>
+      <div class="splash__bar" aria-hidden="true"><span></span></div>
+    </div>
+  </div>
+
+  <div id="app" class="app" inert>
+    <!-- ============ CABEÇALHO ============ -->
+    <header class="topbar">
+      <button id="menuBtn" class="icon-btn" type="button"
+              aria-label="Abrir menu de calculadoras"
+              aria-expanded="false" aria-controls="drawer">
+        <svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" focusable="false"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+        <span class="icon-btn__label">☰ Menu</span>
+      </button>
+
+      <div class="brand">
+        <img src="icon-192.png" width="32" height="32" alt="">
+        <span class="brand__name">Meyer</span>
+      </div>
+
+      <nav class="actions" aria-label="Ações de suporte">
+        <a class="icon-btn" href="https://github.com/magpe-stack/Meyer" target="_blank" rel="noopener noreferrer" aria-label="Repositório no GitHub (abre em nova aba)">
+          <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" focusable="false"><path d="M9 19c-4.3 1.4-4.3-2.5-6-3m12 5v-3.5c0-1 .1-1.4-.5-2 2.8-.3 5.5-1.4 5.5-6a4.6 4.6 0 0 0-1.3-3.2 4.2 4.2 0 0 0-.1-3.2s-1.1-.3-3.5 1.3a12 12 0 0 0-6.2 0C6.5 2.8 5.4 3.1 5.4 3.1a4.2 4.2 0 0 0-.1 3.2A4.6 4.6 0 0 0 4 9.5c0 4.6 2.7 5.7 5.5 6-.6.6-.6 1.2-.5 2V21"/></svg>
+          <span class="icon-btn__label">GitHub</span>
+        </a>
+        <a class="icon-btn" href="https://github.com/magpe-stack/Meyer/blob/main/README.md" target="_blank" rel="noopener noreferrer" aria-label="Ajuda: documentação (abre em nova aba)">
+          <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.7.4-1 .9-1 1.7M12 17h.01"/></svg>
+          <span class="icon-btn__label">Ajuda</span>
+        </a>
+        <button id="aboutBtn" class="icon-btn" type="button" aria-haspopup="dialog" aria-label="Sobre o Meyer">
+          <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7.5h.01"/></svg>
+          <span class="icon-btn__label">Sobre</span>
+        </button>
+        <button id="themeBtn" class="icon-btn" type="button" aria-pressed="false" aria-label="Alternar tema claro e escuro">
+          <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" focusable="false"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+          <span id="themeLabel" class="icon-btn__label">Escuro</span>
+        </button>
+      </nav>
+    </header>
+
+    <!-- ============ MENU SANFONA (gaveta) ============ -->
+    <div id="overlay" class="overlay" hidden></div>
+    <nav id="drawer" class="drawer" aria-label="Calculadoras" aria-hidden="true">
+      <div class="drawer__head">
+        <h2 class="drawer__title">Calculadoras</h2>
+        <button id="closeMenuBtn" class="icon-btn" type="button" aria-label="Fechar menu">
+          <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" focusable="false"><path d="M6 6l12 12M18 6L6 18"/></svg>
+        </button>
+      </div>
+      <ul class="drawer__list">
+        <li><button class="nav-btn" type="button" data-calc="varpct">
+          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M19 5L5 19"/><circle cx="7" cy="7" r="2.5"/><circle cx="17" cy="17" r="2.5"/></svg>
+          <span>1. Variação percentual e pontos percentuais</span></button></li>
+        <li><button class="nav-btn" type="button" data-calc="percapita">
+          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="9" cy="8" r="3"/><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6M16 5.2a3 3 0 0 1 0 5.6M18 14.3c1.8.8 3 2.6 3 4.7"/></svg>
+          <span>2. Taxa per capita (normalização)</span></button></li>
+        <li><button class="nav-btn" type="button" data-calc="orcamento">
+          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><rect x="3" y="6" width="18" height="13" rx="2"/><path d="M3 10h18M16 14.5h2"/></svg>
+          <span>3. Unidades orçamentárias</span></button></li>
+        <li><button class="nav-btn" type="button" data-calc="estat">
+          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M4 20V10M10 20V4M16 20v-8M22 20H2"/></svg>
+          <span>4. Estatística descritiva (média e mediana)</span></button></li>
+        <li><button class="nav-btn" type="button" data-calc="regra3">
+          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M6 6l12 12M18 6L6 18"/><path d="M3 12h2M19 12h2"/></svg>
+          <span>5. Regra de três simples</span></button></li>
+        <li><button class="nav-btn" type="button" data-calc="densidade">
+          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="6" cy="6" r="1.6"/><circle cx="12" cy="6" r="1.6"/><circle cx="18" cy="6" r="1.6"/><circle cx="6" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="18" cy="12" r="1.6"/><circle cx="6" cy="18" r="1.6"/><circle cx="12" cy="18" r="1.6"/><circle cx="18" cy="18" r="1.6"/></svg>
+          <span>6. Densidade demográfica</span></button></li>
+        <li><button class="nav-btn" type="button" data-calc="hectares">
+          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><rect x="2" y="5" width="20" height="14" rx="1"/><path d="M12 5v14"/><circle cx="12" cy="12" r="2.5"/></svg>
+          <span>7. Hectares e campos de futebol</span></button></li>
+        <li><button class="nav-btn" type="button" data-calc="publico">
+          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="8" cy="9" r="2.2"/><circle cx="16" cy="9" r="2.2"/><circle cx="12" cy="5.5" r="2"/><path d="M3 19c0-2.8 2.2-5 5-5s5 2.2 5 5M11 19c0-2.8 2.2-5 5-5s5 2.2 5 5"/></svg>
+          <span>8. Estimador de público por m²</span></button></li>
+      </ul>
+    </nav>
+
+    <!-- ============ PAINEL PRINCIPAL (a calculadora ativa é renderizada aqui por app.js) ============ -->
+    <main id="painel" class="panel" tabindex="-1"></main>
+
+    <footer class="footer">
+      <p>Meyer, em homenagem a Philip Meyer. Todos os cálculos são feitos no seu aparelho; nenhum dado é enviado.</p>
+      <p><a href="https://magpe-stack.github.io/Meyer/">magpe-stack.github.io/Meyer</a> ·
+         <a href="https://github.com/magpe-stack/Meyer" target="_blank" rel="noopener noreferrer">GitHub</a></p>
+    </footer>
+  </div>
+
+  <!-- ============ MODAL "SOBRE" ============ -->
+  <dialog id="aboutDialog" class="dialog" aria-labelledby="aboutTitle">
+    <div class="dialog__head">
+      <h2 id="aboutTitle">Sobre o Meyer</h2>
+      <button id="aboutClose" class="icon-btn" type="button" aria-label="Fechar janela Sobre">
+        <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" focusable="false"><path d="M6 6l12 12M18 6L6 18"/></svg>
+      </button>
+    </div>
+    <div class="dialog__body">
+      <p><strong>Philip Meyer (1930–2022)</strong> foi um jornalista norte-americano, pioneiro do chamado <em>jornalismo de precisão</em>: a ideia de que repórteres devem aplicar métodos das ciências sociais (pesquisas, estatística e análise de dados) para apurar e verificar informações. Seu livro <em>Precision Journalism</em>, de 1973, é uma das bases do jornalismo de dados.</p>
+      <p>O <strong>Meyer</strong> é um hub de oito calculadoras determinísticas para o dia a dia da redação. Cada uma mostra o resultado, explica a conta e gera uma <strong>Minuta da Matéria</strong> com texto pronto para revisão. Os resultados são exatamente reproduzíveis, sem inteligência artificial e sem envio de dados.</p>
+      <p>Confira sempre números e contexto antes de publicar: a ferramenta calcula, a apuração continua sendo do jornalista.</p>
+      <p><a href="https://github.com/magpe-stack/Meyer" target="_blank" rel="noopener noreferrer">Código-fonte no GitHub</a> ·
+         <a href="https://github.com/magpe-stack/Meyer/blob/main/README.md" target="_blank" rel="noopener noreferrer">Documentação</a></p>
+    </div>
+  </dialog>
+
+  <script src="app.js" defer></script>
+</body>
+</html>
