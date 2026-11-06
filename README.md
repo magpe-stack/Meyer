@@ -4,6 +4,9 @@
 
 O **Meyer** é um aplicativo web (PWA) com **8 calculadoras determinísticas** para o dia a dia da redação. Ele foi criado em homenagem a **Philip Meyer** (1930–2022), pioneiro do *jornalismo de precisão*, que defendia o uso de métodos das ciências sociais e da análise de dados na apuração.
 
+![MeyerCover](./MeyerCover.png)
+
+
 Cada calculadora mostra o resultado, deixa clara a conta e gera uma **Minuta da Matéria**: um parágrafo pronto para copiar e revisar. Tudo roda no seu aparelho. Nenhum dado digitado é enviado a servidor algum, e o app funciona **offline** depois do primeiro acesso.
 
 | Recurso | Endereço |
